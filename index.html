@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Mock Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Verdana', sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            height: 100vh;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .header {
+            background: #575757;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            height: 60px;
+        }
+
+        .header-left h1 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .header-left p {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .timer {
+            font-size: 14px;
+            font-weight: 500;
+            background: #fff;
+            color: #1a2d62;
+            padding: 5px 10px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile span {
+            font-size: 13px;
+        }
+
+        .profile select {
+            background: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 3px 5px;
+            font-size: 12px;
+        }
+
+        .section-selector {
+            background: #ffffff;
+            padding: 0px 10px;
+            display: flex;
+            gap: 0px;
+            position: fixed;
+            top: 60px;
+            width: 100%;
+            z-index: 999;
+            border-bottom: 1px solid #d3d3d3;
+        }
+
+        .section-btn {
+            padding: 8px 15px;
+            border: 1px solid #4f5052;
+            border-radius: 4px;
+            background: #fff;
+            color: #1a2d62;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .section-btn.active {
+            background: #555555;
+            color: #fff;
+            border-color: #1a2d62;
+        }
+
+        .section-btn:hover:not(.active) {
+            background: #d3d9e6;
+        }
+
+        .js-toggle-sidebar-btn {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            right: 350px;
+            width: 20px;
+            height: 60px;
+            background: #1a2d62;
+            border: none;
+            border-radius: 4px 0 0 4px;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+        }
+
+        .js-toggle-sidebar-btn:hover {
+            background: #555555;
+        }
+
+        .js-toggle-sidebar-btn.closed {
+            right: 0;
+        }
+
+        .js-toggle-sidebar-btn::before { content: '❯'; }
+        .js-toggle-sidebar-btn.closed::before { content: '❮'; }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            margin-top: 100px;
+            overflow: hidden;
+        }
+
+        .question-area {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-bottom: 60px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .question-header h2 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a2d62;
+        }
+
+        .question-content {
+            padding: 10px;
+            flex-grow: 1;
+        }
+
+        #question-text {
+            font-size: 15px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            margin: 5px 0;
+            background: #ffffff;
+            border: 1px solid #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+            accent-color: #1a2d62;
+        }
+
+        .question-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 350px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: #e8ecef;
+            border-top: 1px solid #d3d3d3;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .question-controls.closed {
+            right: 0;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn.primary {
+            background: #1a2d62;
+            color: #fff;
+        }
+
+        .btn.primary:hover {
+            background: #2e437b;
+        }
+
+        .btn.submit {
+            background: #429cdf;
+            color: #fff;
+        }
+
+        .btn.submit:hover {
+            background: #b71c1c;
+        }
+
+        .btn.mark-review {
+            background: #6a1b9a;
+            color: #fff;
+        }
+
+        .btn.mark-review:hover {
+            background: #4a0072;
+        }
+
+        .btn.clear {
+            background: #757575;
+            color: #fff;
+        }
+
+        .btn.clear:hover {
+            background: #616161;
+        }
+
+        .sidebar {
+            width: 350px;
+            background: #fff;
+            border-left: 1px solid #d3d3d3;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar.closed {
+            width: 0;
+        }
+
+        .sidebar-header {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .sidebar-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a2d62;
+            margin-bottom: 10px;
+        }
+
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .stat.answered::before { content: '●'; color: #388e3c; }
+        .stat.not-answered::before { content: '●'; color: #d32f2f; }
+        .stat.not-visited::before { content: '●'; color: #757575; }
+        .stat.marked::before { content: '●'; color: #6a1b9a; }
+
+        .palette-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .palette-container h4 {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .palette-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .palette-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 10%;
+            border: 1px solid #d3d3d3;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .palette-btn:hover {
+            border-color: #1a2d62;
+        }
+
+        .palette-btn.current {
+            background: #ff9800;
+            color: #fff;
+            border-color: #ff9800;
+        }
+
+        .palette-btn.answered {
+            background: #388e3c;
+            color: #fff;
+            border-color: #388e3c;
+        }
+
+        .palette-btn.answered::after {
+            content: '✔';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            color: #fff;
+            font-size: 10px;
+        }
+
+        .palette-btn.marked {
+            background: #6a1b9a;
+            color: #fff;
+            border-color: #6a1b9a;
+        }
+
+        .palette-btn.marked.answered::after {
+            content: '✔';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            color: #fff;
+            font-size: 10px;
+        }
+
+        .palette-btn.visited-not-attempted {
+            background: #df6262;
+            color: #fff;
+            border-color: #d32f2f;
+        }
+
+        .palette-btn.correct {
+            background: #388e3c;
+            color: #fff;
+            border-color: #388e3c;
+        }
+
+        .palette-btn.correct::after {
+            content: '✔';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            color: #fff;
+            font-size: 10px;
+        }
+
+        .palette-btn.incorrect {
+            background: #d32f2f;
+            color: #fff;
+            border-color: #d32f2f;
+        }
+
+        .sidebar-footer {
+            padding: 10px;
+            border-top: 1px solid #e0e0e0;
+            background: #fff;
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+        }
+
+        .instructions-container, .result-container, .analysis-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #cbcbcb;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instructions-header, .result-header, .analysis-header {
+            background: #575757;
+            color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            height: 60px;
+        }
+
+        .instructions-header h1, .result-header h1, .analysis-header h1 {
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .instructions-main, .result-main, .analysis-main {
+            display: flex;
+            flex: 1;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            overflow: hidden;
+        }
+
+        .instructions-content, .result-content, .analysis-content {
+            flex: 1;
+            padding: 20px;
+            background: #fff;
+            overflow-y: auto;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .instructions-sidebar, .analysis-sidebar {
+            width: 350px;
+            background: #fff;
+            border-left: 1px solid #d3d3d3;
+            padding: 20px;
+            overflow-y: auto;
+            border-radius: 0 0 4px 0;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .instructions-content h2, .result-content h2, .analysis-content h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a2d62;
+            margin: 0 0 15px;
+        }
+
+        .instructions-content h3, .result-content h3, .analysis-content h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin: 15px 0 10px;
+        }
+
+        .instructions-content p, .result-content p, .analysis-content p {
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .instructions-content ul, .analysis-content ul {
+            list-style-type: decimal;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .instructions-content ul li, .analysis-content ul li {
+            font-size: 13px;
+            margin: 5px 0;
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .legend-dot.not-visited { background: #757575; }
+        .legend-dot.not-answered { background: #d32f2f; }
+        .legend-dot.answered { background: #388e3c; }
+        .legend-dot.marked { background: #6a1b9a; }
+        .legend-dot.marked-answered { background: #6a1b9a; }
+        .legend-dot.correct { background: #388e3c; }
+        .legend-dot.incorrect { background: #d32f2f; }
+
+        .instructions-footer, .result-footer, .analysis-footer {
+            background: #e8ecef;
+            padding: 10px 20px;
+            border-top: 1px solid #d3d3d3;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .analysis-footer .btn {
+            margin: 0 10px;
+        }
+
+        .language-selector {
+            margin: 20px 0;
+            margin-top: 300px;
+        }
+
+        .language-selector label {
+            font-size: 13px;
+            color: #333;
+        }
+
+        .language-selector select {
+            margin-left: 8px;
+            padding: 5px;
+            border: 1px solid #d3d3d3;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .declaration {
+            margin: 10px 0;
+            font-size: 12px;
+            color: #333;
+        }
+
+        .declaration input {
+            margin-right: 8px;
+            accent-color: #1a2d62;
+        }
+
+        .instruction-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .login-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 50%;
+            background: #fff;
+            width: 360px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .login-section h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a2d62;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-input {
+            margin: 10px 0;
+            padding: 12px;
+            width: 100%;
+            border: 1px solid #1a2d62;
+            border-radius: 4px;
+            font-size: 14px;
+            background: #fff;
+            color: #333;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #2e437b;
+            box-shadow: 0 0 5px rgba(46, 67, 123, 0.3);
+        }
+
+        .login-input::placeholder {
+            color: #999;
+        }
+
+        .login-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .exam-table, .result-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+
+        .exam-table th, .exam-table td, .result-table th, .result-table td {
+            border: 1px solid #d3d3d3;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .exam-table th, .result-table th {
+            background: #1a2d62;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .exam-table td, .result-table td {
+            background: #f9f9f9;
+        }
+
+        .instructions-sidebar h3, .analysis-sidebar h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a2d62;
+            margin-bottom: 15px;
+        }
+
+        .instructions-sidebar p, .analysis-sidebar p {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .instructions-sidebar ul, .analysis-sidebar ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .instructions-sidebar ul li, .analysis-sidebar ul li {
+            font-size: 12px;
+            margin: 5px 0;
+        }
+
+        .analysis-options label {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: #f9f9f9;
+            border: 1px solid #d3d3d3;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .analysis-options label.correct {
+            background: #e8f5e9;
+            border-color: #388e3c;
+            font-weight: 500;
+        }
+
+        .analysis-options label.incorrect {
+            background: #ffebee;
+            border-color: #d32f2f;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div id="login-page" class="instructions-container">
+            <div class="instructions-header">
+                <h1>PRIME MOCK LOGIN</h1>
+            </div>
+            <div class="instructions-main">
+                <div class="instructions-content">
+                    <div class="login-section">
+                        <h2>Login to Your Account</h2>
+                        <input type="text" id="username" class="login-input" placeholder="Username" value="TESTUSER">
+                        <input type="password" id="password" class="login-input" placeholder="Password" value="Test@123">
+                        <button class="btn primary login-btn" onclick="login()">Login</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="instructions-page" class="instructions-container" style="display: none;">
+            <div class="instructions-header">
+                <h1>Science Mock Test</h1>
+            </div>
+            <div class="instructions-main">
+                <div class="instructions-content">
+                    <h2>Instructions</h2>
+                    <h3>General Instructions:</h3>
+                    <ul>
+                        <li>Total duration of examination is 60 minutes.</li>
+                        <li>The countdown timer in the top right corner will display the remaining time. When it reaches zero, the test will end.</li>
+                        <li>The Question Palette on the right shows question status:
+                            <ul>
+                                <li><span class="legend-dot not-visited"></span> Not Visited</li>
+                                <li><span class="legend-dot not-answered"></span> Not Answered</li>
+                                <li><span class="legend-dot answered"></span> Answered</li>
+                                <li><span class="legend-dot marked"></span> Marked for Review</li>
+                                <li><span class="legend-dot marked-answered"></span> Answered and Marked for Review</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div class="instructions-sidebar"></div>
+            </div>
+            <div class="instructions-footer">
+                <button class="btn primary" onclick="showOtherInstructions()">Next</button>
+            </div>
+        </div>
+
+        <div id="other-instructions-page" class="instructions-container" style="display: none;">
+            <div class="instructions-header">
+                <h1>Other Important Instructions</h1>
+            </div>
+            <div class="instructions-main">
+                <div class="instructions-content">
+                    <p>This is a Mock test for practice only.</p>
+                    <h3>Science Exam Structure</h3>
+                    <table class="exam-table">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>No. of Questions</th>
+                                <th>Maximum Marks</th>
+                                <th>Time Allotted</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Science</td><td>100</td><td>100</td><td>60 minutes</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="language-selector">
+                        <label>Choose your default language:</label>
+                        <select id="default-language">
+                            <option value="">-- Select --</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="declaration">
+                        <input type="checkbox" id="declaration-checkbox">
+                        <label for="declaration-checkbox">I have read and understood the instructions.</label>
+                    </div>
+                </div>
+                <div class="instructions-sidebar">
+                   
+                </div>
+            </div>
+            <div class="instructions-footer">
+                <div class="instruction-controls">
+                    <button class="btn primary" onclick="backToInstructions()">Previous</button>
+                    <button class="btn primary" id="start-test-btn" onclick="startTest()" disabled>I am ready to begin</button>
+                </div>
+            </div>
+        </div>
+
+        <header id="header" class="header" style="display: none;">
+            <div class="header-left">
+                <h1>Science Mock Test</h1>
+                <p>Section: <span id="section-name">Science</span></p>
+            </div>
+            <div class="header-right">
+                <div class="timer">Time Left: <span id="time">60:00</span></div>
+                <div class="profile">
+                    <select id="language-selector">
+                        <option value="en">View in: English</option>
+                    </select>
+                </div>
+            </div>
+        </header>
+
+        <div id="section-selector" class="section-selector" style="display: none;"></div>
+
+        <button id="toggle-btn" class="js-toggle-sidebar-btn" onclick="toggleSidebar()" style="display: none;">❯</button>
+
+        <div id="main-content" class="main-content" style="display: none;">
+            <section class="question-area">
+                <div>
+                    <div class="question-header">
+                        <h2>Question Type: Multiple Choice Question</h2>
+                        <h2>Question No. <span id="q-number">1</span></h2>
+                    </div>
+                    <div class="question-content">
+                        <p id="question-text">Loading question...</p>
+                        <div id="options" class="options"></div>
+                    </div>
+                </div>
+                <div id="question-controls" class="question-controls">
+                    <div>
+                        <button id="prev-btn" class="btn primary">Previous</button>
+                        <button id="mark-review-btn" class="btn mark-review">Mark for Review & Next</button>
+                        <button id="clear-btn" class="btn clear">Clear Response</button>
+                    </div>
+                    <div>
+                        <button id="next-btn" class="btn primary">Save & Next</button>
+                        <button id="submit-btn" class="btn submit">Submit</button>
+                    </div>
+                </div>
+            </section>
+
+            <aside id="sidebar" class="sidebar">
+                <div class="sidebar-header">
+                    <h3 id="palette-section-name">Science</h3>
+                    <div class="stats">
+                        <span class="stat answered">0 Answered</span>
+                        <span class="stat not-answered">0 Not Answered</span>
+                        <span class="stat not-visited">0 Not Visited</span>
+                        <span class="stat marked">0 Marked for Review</span>
+                    </div>
+                </div>
+                <div class="palette-container">
+                    <h4>Choose a Question</h4>
+                    <div class="palette-grid" id="palette-buttons"></div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="btn submit" onclick="endTest()">Submit Test</button>
+                </div>
+            </aside>
+        </div>
+
+        <div id="result-page" class="result-container" style="display: none;">
+            <div class="result-header">
+                <h1>Test Results</h1>
+            </div>
+            <div class="result-main">
+                <div class="result-content">
+                    <h2>Your Performance Summary</h2>
+                    <table class="result-table">
+                        <thead>
+                            <tr>
+                                <th>Section</th>
+                                <th>Total Questions</th>
+                                <th>Answered</th>
+                                <th>Correct</th>
+                                <th>Incorrect</th>
+                                <th>Marks</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-table-body"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td id="total-questions"></td>
+                                <td id="total-answered"></td>
+                                <td id="total-correct"></td>
+                                <td id="total-incorrect"></td>
+                                <td id="total-marks"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <p><strong>Overall Score:</strong> <span id="overall-score"></span> / 100</p>
+                </div>
+            </div>
+            <div class="result-footer">
+                <button class="btn primary" onclick="showAnalysis()">Review Answers</button>
+                <button class="btn submit" onclick="restartTest()">Restart Test</button>
+            </div>
+        </div>
+
+        <div id="analysis-page" class="analysis-container" style="display: none;">
+            <div class="analysis-header">
+                <h1>Answer Analysis</h1>
+            </div>
+            <div id="analysis-section-selector" class="section-selector"></div>
+            <div class="analysis-main">
+                <div class="analysis-content">
+                    <div class="question-header">
+                        <h2>Question No. <span id="analysis-q-number">1</span></h2>
+                    </div>
+                    <p id="analysis-question-text">Loading question...</p>
+                    <div id="analysis-options" class="analysis-options"></div>
+                    <h3>Correct Answer:</h3>
+                    <p id="correct-answer"></p>
+                    <h3>Explanation:</h3>
+                    <p id="explanation">Loading explanation...</p>
+                </div>
+                <div class="analysis-sidebar">
+                    <h3>Question Palette</h3>
+                    <div class="palette-grid" id="analysis-palette-buttons"></div>
+                </div>
+            </div>
+            <div class="analysis-footer">
+                <button class="btn primary" onclick="prevAnalysisQuestion()">Previous</button>
+                <button class="btn primary" onclick="nextAnalysisQuestion()">Next</button>
+                <button class="btn submit" onclick="backToResults()">Back to Results</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let currentSection = 0;
+        let analysisQuestion = 0;
+        let analysisSection = 0;
+        let answers = [];
+        let markedForReview = [];
+        let visited = [];
+        let timeLeft = 3600; // 60 minutes
+        let timerInterval;
+        let currentUser = null;
+        let results = {};
+
+        const sections = [
+            {
+                name: "Science",
+                start: 0,
+                end: 99,
+                questions: [
+                    { q: "Which of the following is a characteristic of a solid?", options: ["Particles are far apart", "Fixed shape and volume", "High compressibility", "Flows easily"], answer: 1, explanation: "Solids have a definite shape and volume due to closely packed particles with strong intermolecular forces." },
+                    { q: "What happens to the particles of a substance during melting?", options: ["They lose energy", "They gain energy and move apart", "They stop moving", "They form a gas"], answer: 1, explanation: "Melting involves absorbing heat energy, causing particles to overcome forces and move farther apart, changing from solid to liquid." },
+                    { q: "Which process involves a direct change from solid to gas?", options: ["Melting", "Evaporation", "Sublimation", "Condensation"], answer: 2, explanation: "Sublimation is the process where a solid changes directly to a gas without passing through the liquid state, e.g., naphthalene balls." },
+                    { q: "The boiling point of water at standard atmospheric pressure is:", options: ["0°C", "50°C", "100°C", "150°C"], answer: 2, explanation: "At 1 atm pressure, water boils at 100°C, as per NCERT." },
+                    { q: "Which state of matter has the highest kinetic energy of particles?", options: ["Solid", "Liquid", "Gas", "Plasma"], answer: 2, explanation: "Gas particles have the highest kinetic energy due to their rapid, random motion and large intermolecular spaces." },
+                    { q: "Which of the following is a mixture?", options: ["Distilled water", "Salt solution", "Sugar crystals", "Oxygen gas"], answer: 1, explanation: "A mixture contains two or more substances that retain their properties, like salt dissolved in water." },
+                    { q: "The process used to separate salt from seawater is:", options: ["Filtration", "Evaporation", "Distillation", "Sublimation"], answer: 1, explanation: "Evaporation removes water, leaving salt behind, a common method for obtaining salt from seawater." },
+                    { q: "Which type of mixture shows the Tyndall effect?", options: ["Solution", "Suspension", "Colloid", "Compound"], answer: 2, explanation: "Colloids scatter light (Tyndall effect) due to larger particle sizes, unlike true solutions." },
+                    { q: "What is the solvent in a brass alloy?", options: ["Zinc", "Copper", "Iron", "Nickel"], answer: 1, explanation: "Brass is an alloy of copper (solvent) and zinc (solute)." },
+                    { q: "Which method separates immiscible liquids?", options: ["Distillation", "Separating funnel", "Filtration", "Evaporation"], answer: 1, explanation: "A separating funnel uses density differences to separate immiscible liquids like oil and water." },
+                    { q: "The smallest particle of a compound is:", options: ["Atom", "Molecule", "Ion", "Element"], answer: 1, explanation: "A molecule is the smallest unit of a compound that retains its chemical properties." },
+                    { q: "What is the atomicity of oxygen (O₂)?", options: ["1", "2", "3", "4"], answer: 1, explanation: "Oxygen exists as O₂, a diatomic molecule with an atomicity of 2." },
+                    { q: "The law of conservation of mass was proposed by:", options: ["Dalton", "Lavoisier", "Proust", "Avogadro"], answer: 1, explanation: "Lavoisier proposed that mass is conserved in a chemical reaction." },
+                    { q: "One mole of any substance contains how many particles?", options: ["6.022 × 10²²", "6.022 × 10²³", "6.022 × 10²⁴", "6.022 × 10²⁵"], answer: 1, explanation: "One mole equals Avogadro’s number, 6.022 × 10²³ particles." },
+                    { q: "The molecular mass of water (H₂O) is:", options: ["16 u", "18 u", "20 u", "22 u"], answer: 1, explanation: "H₂O = (2 × 1) + 16 = 18 u (atomic masses: H = 1, O = 16)." },
+                    { q: "Who discovered the electron?", options: ["Rutherford", "Thomson", "Bohr", "Dalton"], answer: 1, explanation: "J.J. Thomson discovered the electron through cathode ray experiments." },
+                    { q: "The nucleus of an atom contains:", options: ["Electrons and protons", "Protons and neutrons", "Electrons and neutrons", "Only electrons"], answer: 1, explanation: "The nucleus consists of protons and neutrons; electrons orbit around it." },
+                    { q: "An atom with 6 protons and 6 neutrons has a mass number of:", options: ["6", "12", "18", "24"], answer: 1, explanation: "Mass number = protons + neutrons = 6 + 6 = 12." },
+                    { q: "Isotopes differ in the number of:", options: ["Protons", "Electrons", "Neutrons", "Nuclei"], answer: 2, explanation: "Isotopes have the same number of protons but different neutrons, e.g., C-12 and C-14." },
+                    { q: "The maximum number of electrons in the K shell is:", options: ["2", "8", "18", "32"], answer: 0, explanation: "The K shell (n=1) can hold 2n² = 2(1)² = 2 electrons." },
+                    { q: "Who discovered the cell?", options: ["Robert Hooke", "Leeuwenhoek", "Schwann", "Virchow"], answer: 0, explanation: "Robert Hooke first observed cells in cork using a microscope in 1665." },
+                    { q: "Which organelle is absent in animal cells?", options: ["Mitochondria", "Cell wall", "Nucleus", "Endoplasmic reticulum"], answer: 1, explanation: "The cell wall is present in plant cells but absent in animal cells." },
+                    { q: "The process of cell division in prokaryotes is called:", options: ["Mitosis", "Meiosis", "Binary fission", "Budding"], answer: 2, explanation: "Prokaryotes like bacteria divide by binary fission, splitting into two identical cells." },
+                    { q: "Which molecule is the main source of energy in cells?", options: ["Glucose", "ATP", "DNA", "RNA"], answer: 1, explanation: "ATP (adenosine triphosphate) is the energy currency of the cell." },
+                    { q: "The site of protein synthesis in a cell is:", options: ["Nucleus", "Ribosomes", "Mitochondria", "Golgi apparatus"], answer: 1, explanation: "Ribosomes synthesize proteins using mRNA instructions." },
+                    { q: "Which tissue transports water in plants?", options: ["Phloem", "Xylem", "Parenchyma", "Collenchyma"], answer: 1, explanation: "Xylem transports water and minerals from roots to other parts of the plant." },
+                    { q: "Muscle cells are specialized for:", options: ["Storage", "Contraction", "Protection", "Secretion"], answer: 1, explanation: "Muscle tissue is designed for movement through contraction." },
+                    { q: "Which of the following is a permanent tissue?", options: ["Meristematic", "Parenchyma", "Cambium", "Apical meristem"], answer: 1, explanation: "Parenchyma is a permanent tissue; meristematic tissues are temporary and divide." },
+                    { q: "The tissue that connects muscles to bones is:", options: ["Ligament", "Tendon", "Cartilage", "Areolar"], answer: 1, explanation: "Tendons are strong connective tissues linking muscles to bones." },
+                    { q: "Which animal tissue provides insulation?", options: ["Epithelial", "Connective", "Muscular", "Nervous"], answer: 1, explanation: "Adipose tissue (a type of connective tissue) stores fat and provides insulation." },
+                    { q: "Which kingdom includes bacteria?", options: ["Plantae", "Animalia", "Monera", "Fungi"], answer: 2, explanation: "Monera includes prokaryotic organisms like bacteria." },
+                    { q: "Ferns belong to which group of plants?", options: ["Thallophyta", "Bryophyta", "Pteridophyta", "Gymnosperms"], answer: 2, explanation: "Ferns are vascular plants without seeds, classified under Pteridophyta." },
+                    { q: "Which feature distinguishes mammals from reptiles?", options: ["Scales", "Mammary glands", "Cold-bloodedness", "Egg-laying"], answer: 1, explanation: "Mammals have mammary glands for milk production, unlike reptiles." },
+                    { q: "The body of a sponge is characterized by:", options: ["Segmentation", "Pores", "Jointed legs", "Wings"], answer: 1, explanation: "Sponges (Porifera) have a porous body for water flow." },
+                    { q: "Which organism is a coelenterate?", options: ["Earthworm", "Hydra", "Cockroach", "Frog"], answer: 1, explanation: "Hydra belongs to Coelenterata, characterized by a hollow body cavity." },
+                    { q: "The rate of change of velocity is called:", options: ["Speed", "Acceleration", "Distance", "Displacement"], answer: 1, explanation: "Acceleration is the change in velocity per unit time." },
+                    { q: "A car travels 60 km in 2 hours. Its average speed is:", options: ["20 km/h", "30 km/h", "40 km/h", "50 km/h"], answer: 1, explanation: "Average speed = total distance / total time = 60 / 2 = 30 km/h." },
+                    { q: "Which of the following is a scalar quantity?", options: ["Velocity", "Acceleration", "Speed", "Force"], answer: 2, explanation: "Speed has magnitude only, making it scalar; velocity and force are vectors." },
+                    { q: "The distance-time graph for uniform motion is a:", options: ["Straight line", "Curve", "Parabola", "Circle"], answer: 0, explanation: "Uniform motion implies constant speed, shown as a straight line on a distance-time graph." },
+                    { q: "An object at rest has a velocity of:", options: ["0 m/s", "1 m/s", "9.8 m/s", "10 m/s"], answer: 0, explanation: "An object at rest has no motion, so its velocity is zero." },
+                    { q: "Newton’s first law of motion is also known as the law of:", options: ["Acceleration", "Inertia", "Action-Reaction", "Gravitation"], answer: 1, explanation: "Newton’s first law states that an object remains at rest or in motion unless acted upon, defining inertia." },
+                    { q: "The momentum of an object depends on:", options: ["Mass and velocity", "Mass only", "Velocity only", "Acceleration"], answer: 0, explanation: "Momentum = mass × velocity." },
+                    { q: "Which law explains why we feel a forward jerk when a bus stops suddenly?", options: ["First law", "Second law", "Third law", "Law of gravitation"], answer: 0, explanation: "The body tends to continue moving forward due to inertia (first law)." },
+                    { q: "The force required to produce an acceleration of 2 m/s² on a 5 kg mass is:", options: ["5 N", "10 N", "15 N", "20 N"], answer: 1, explanation: "Force = mass × acceleration = 5 × 2 = 10 N." },
+                    { q: "Action and reaction forces act on:", options: ["The same body", "Different bodies", "Parallel planes", "Opposite directions only"], answer: 1, explanation: "Newton’s third law states that action and reaction forces act on two different bodies." },
+                    { q: "The force of attraction between two objects is called:", options: ["Friction", "Gravitation", "Tension", "Magnetism"], answer: 1, explanation: "Gravitation is the force of attraction between masses." },
+                    { q: "The value of ‘g’ is maximum at:", options: ["Poles", "Equator", "Sea level", "Mountains"], answer: 0, explanation: "‘g’ is slightly higher at the poles due to Earth’s oblate shape." },
+                    { q: "Weight of an object is:", options: ["Mass × acceleration", "Mass × gravity", "Mass / gravity", "Mass only"], answer: 1, explanation: "Weight = mass × gravitational acceleration (mg)." },
+                    { q: "An object weighs less on the Moon because:", options: ["Moon has no gravity", "Moon’s gravity is weaker", "Moon has no atmosphere", "Moon is smaller"], answer: 1, explanation: "Moon’s gravity is 1/6th of Earth’s, reducing weight." },
+                    { q: "The universal gravitational constant (G) has the unit:", options: ["N m²/kg²", "kg m/s²", "m/s²", "N/kg"], answer: 0, explanation: "G’s unit is derived from F = G(m₁m₂/r²)." },
+                    { q: "Work is zero when force and displacement are:", options: ["Parallel", "Perpendicular", "Opposite", "Equal"], answer: 1, explanation: "Work = F × d × cosθ; when θ = 90°, cos90° = 0, so work = 0." },
+                    { q: "The SI unit of energy is:", options: ["Newton", "Joule", "Watt", "Pascal"], answer: 1, explanation: "Energy is measured in Joules (J), where 1 J = 1 N·m." },
+                    { q: "Kinetic energy depends on:", options: ["Mass and height", "Mass and velocity", "Height and gravity", "Velocity and gravity"], answer: 1, explanation: "KE = ½ mv²." },
+                    { q: "A body at rest has:", options: ["Kinetic energy", "Potential energy", "Both", "Neither"], answer: 1, explanation: "At rest, an object may have potential energy (e.g., due to height) but no kinetic energy." },
+                    { q: "Power is defined as:", options: ["Work × time", "Work / time", "Force × distance", "Mass × acceleration"], answer: 1, explanation: "Power = work done per unit time, measured in watts." },
+                    { q: "Sound waves are:", options: ["Transverse waves", "Longitudinal waves", "Electromagnetic waves", "Stationary waves"], answer: 1, explanation: "Sound travels as compressions and rarefactions, characteristic of longitudinal waves." },
+                    { q: "The speed of sound is highest in:", options: ["Air", "Water", "Iron", "Vacuum"], answer: 2, explanation: "Sound travels fastest in solids like iron due to closely packed particles." },
+                    { q: "The human ear can hear sounds in the frequency range of:", options: ["20 Hz to 20 kHz", "10 Hz to 10 kHz", "30 Hz to 30 kHz", "5 Hz to 5 kHz"], answer: 0, explanation: "The audible range for humans is 20 Hz to 20,000 Hz (20 kHz)." },
+                    { q: "Echo is caused by:", options: ["Refraction of sound", "Reflection of sound", "Diffraction of sound", "Absorption of sound"], answer: 1, explanation: "An echo occurs when sound reflects off a surface and returns to the listener." },
+                    { q: "The loudness of sound depends on:", options: ["Frequency", "Amplitude", "Wavelength", "Speed"], answer: 1, explanation: "Loudness increases with the amplitude of sound waves." },
+                    { q: "Diseases caused by pathogens are called:", options: ["Chronic", "Acute", "Infectious", "Deficiency"], answer: 2, explanation: "Infectious diseases are caused by pathogens like bacteria or viruses." },
+                    { q: "Which organ is affected by jaundice?", options: ["Heart", "Lungs", "Liver", "Kidney"], answer: 2, explanation: "Jaundice affects the liver, causing yellowing of skin due to bilirubin buildup." },
+                    { q: "Vaccination helps in developing:", options: ["Antibodies", "Antigens", "Pathogens", "Toxins"], answer: 0, explanation: "Vaccines stimulate the immune system to produce antibodies against specific diseases." },
+                    { q: "Which disease is caused by a deficiency of Vitamin C?", options: ["Scurvy", "Rickets", "Beriberi", "Anemia"], answer: 0, explanation: "Scurvy results from a lack of Vitamin C, affecting gums and skin." },
+                    { q: "The vector for malaria is:", options: ["Housefly", "Mosquito", "Rat", "Cockroach"], answer: 1, explanation: "Female Anopheles mosquitoes transmit the malaria parasite." },
+                    { q: "The most abundant gas in the atmosphere is:", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Argon"], answer: 1, explanation: "Nitrogen makes up 78% of Earth’s atmosphere." },
+                    { q: "The process by which water vapor turns into liquid is:", options: ["Evaporation", "Condensation", "Sublimation", "Precipitation"], answer: 1, explanation: "Condensation is the conversion of water vapor to liquid, forming clouds." },
+                    { q: "Which gas is fixed by bacteria in the nitrogen cycle?", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Hydrogen"], answer: 1, explanation: "Nitrogen-fixing bacteria convert atmospheric N₂ into compounds plants can use." },
+                    { q: "Soil erosion is primarily caused by:", options: ["Wind and water", "Sunlight", "Temperature", "Earthquakes"], answer: 0, explanation: "Wind and water remove topsoil, leading to erosion." },
+                    { q: "Ozone layer protects Earth from:", options: ["Infrared rays", "Ultraviolet rays", "X-rays", "Gamma rays"], answer: 1, explanation: "The ozone layer absorbs harmful UV radiation from the sun." },
+                    { q: "Which of the following is a kharif crop?", options: ["Wheat", "Rice", "Barley", "Mustard"], answer: 1, explanation: "Kharif crops are sown in the rainy season (e.g., rice); wheat is a rabi crop." },
+                    { q: "Manure improves soil by adding:", options: ["Chemicals", "Organic matter", "Pesticides", "Salts"], answer: 1, explanation: "Manure enriches soil with organic matter, improving fertility." },
+                    { q: "The process of breeding animals for desired traits is called:", options: ["Hybridization", "Irrigation", "Weeding", "Harvesting"], answer: 0, explanation: "Hybridization involves crossing animals to enhance traits like milk yield." },
+                    { q: "Which nutrient is provided by fertilizers?", options: ["Nitrogen", "Oxygen", "Carbon", "Hydrogen"], answer: 0, explanation: "Fertilizers supply nitrogen, phosphorus, and potassium for plant growth." },
+                    { q: "Apiculture is the rearing of:", options: ["Fish", "Bees", "Poultry", "Cattle"], answer: 1, explanation: "Apiculture is beekeeping for honey and wax production." },
+                    { q: "Which gas is released during photosynthesis?", options: ["Carbon dioxide", "Oxygen", "Nitrogen", "Hydrogen"], answer: 1, explanation: "Plants release oxygen as a byproduct of photosynthesis." },
+                    { q: "The SI unit of pressure is:", options: ["Newton", "Pascal", "Joule", "Watt"], answer: 1, explanation: "Pressure is force per unit area, measured in Pascals (Pa)." },
+                    { q: "Which organelle contains chlorophyll?", options: ["Mitochondria", "Chloroplast", "Nucleus", "Ribosome"], answer: 1, explanation: "Chloroplasts contain chlorophyll for photosynthesis." },
+                    { q: "The formula for acceleration is:", options: ["v/t", "(v-u)/t", "s/t", "F/m"], answer: 1, explanation: "Acceleration = (final velocity - initial velocity) / time." },
+                    { q: "Which animal is an amphibian?", options: ["Crocodile", "Frog", "Snake", "Lizard"], answer: 1, explanation: "Frogs live both on land and in water, characteristic of amphibians." },
+                    { q: "The process of conversion of sugar into alcohol is:", options: ["Fermentation", "Oxidation", "Reduction", "Hydrolysis"], answer: 0, explanation: "Fermentation by yeast converts sugars into alcohol and CO₂." },
+                    { q: "Which of the following is a chemical change?", options: ["Tearing paper", "Burning paper", "Melting wax", "Cutting wood"], answer: 1, explanation: "Burning paper forms new substances (ash, CO₂), a chemical change." },
+                    { q: "The brain is part of which tissue system?", options: ["Muscular", "Nervous", "Connective", "Epithelial"], answer: 1, explanation: "The brain is composed of nervous tissue for signal transmission." },
+                    { q: "Which planet has the strongest gravitational pull?", options: ["Earth", "Jupiter", "Mars", "Venus"], answer: 1, explanation: "Jupiter, the largest planet, has the strongest gravity." },
+                    { q: "The pitch of sound depends on:", options: ["Amplitude", "Frequency", "Wavelength", "Speed"], answer: 1, explanation: "Higher frequency results in higher pitch." },
+                    { q: "Which is a non-metal?", options: ["Sodium", "Sulfur", "Iron", "Copper"], answer: 1, explanation: "Sulfur is a non-metal; others are metals." },
+                    { q: "The energy stored in a stretched spring is:", options: ["Kinetic", "Potential", "Thermal", "Chemical"], answer: 1, explanation: "A stretched spring stores elastic potential energy." },
+                    { q: "Which of the following is a vector quantity?", options: ["Speed", "Distance", "Velocity", "Energy"], answer: 2, explanation: "Velocity has both magnitude and direction, making it a vector." },
+                    { q: "The process of water movement in plants is called:", options: ["Transpiration", "Photosynthesis", "Respiration", "Diffusion"], answer: 0, explanation: "Transpiration is the evaporation of water from plant leaves." },
+                    { q: "Which disease is caused by a virus?", options: ["Tuberculosis", "Influenza", "Typhoid", "Cholera"], answer: 1, explanation: "Influenza (flu) is caused by a virus; others are bacterial." },
+                    { q: "The atomic number of an element equals the number of:", options: ["Protons", "Neutrons", "Electrons", "Nucleons"], answer: 0, explanation: "Atomic number is the number of protons in an atom." },
+                    { q: "Which of the following is a conductor?", options: ["Plastic", "Copper", "Wood", "Rubber"], answer: 1, explanation: "Copper conducts electricity; others are insulators." },
+                    { q: "The primary source of energy on Earth is:", options: ["Coal", "Sun", "Wind", "Water"], answer: 1, explanation: "The Sun drives most energy processes (e.g., solar, wind, fossil fuels)." },
+                    { q: "Which tissue covers the outer surface of the body?", options: ["Muscular", "Nervous", "Epithelial", "Connective"], answer: 2, explanation: "Epithelial tissue forms the skin and linings." },
+                    { q: "The unit of frequency is:", options: ["Hertz", "Joule", "Watt", "Newton"], answer: 0, explanation: "Frequency is measured in Hertz (Hz), cycles per second." },
+                    { q: "Which gas causes the greenhouse effect?", options: ["Oxygen", "Nitrogen", "Carbon dioxide", "Helium"], answer: 2, explanation: "CO₂ traps heat, contributing to the greenhouse effect." },
+                    { q: "The speed of light in a vacuum is:", options: ["3 × 10⁶ m/s", "3 × 10⁷ m/s", "3 × 10⁸ m/s", "3 × 10⁹ m/s"], answer: 2, explanation: "Light travels at 3 × 10⁸ m/s in a vacuum." },
+                    { q: "Which of the following is a biodegradable waste?", options: ["Plastic", "Glass", "Paper", "Metal"], answer: 2, explanation: "Paper decomposes naturally, unlike plastic or glass." },
+                    { q: "The chemical formula of common salt is:", options: ["NaCl", "KCl", "CaCl₂", "MgCl₂"], answer: 0, explanation: "Common salt is sodium chloride (NaCl)." },
+                    { q: "Which animal is a reptile?", options: ["Crocodile", "Dolphin", "Whale", "Bat"], answer: 0, explanation: "Crocodiles are reptiles with scaly skin and egg-laying habits." }
+                ]
+            }
+        ];
+
+        const totalQuestions = 100;
+        answers = new Array(totalQuestions).fill(null);
+        markedForReview = new Array(totalQuestions).fill(false);
+        visited = new Array(totalQuestions).fill(false);
+
+        const defaultUsers = [{ username: "TESTUSER", password: "Test@123", hasAttempted: false }];
+        localStorage.setItem("users", JSON.stringify(defaultUsers));
+
+        function login() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const users = JSON.parse(localStorage.getItem("users") || "[]");
+            const validUser = users.find(u => u.username === username && u.password === password);
+            if (validUser) {
+                currentUser = validUser;
+                document.getElementById("login-page").style.display = "none";
+                document.getElementById("instructions-page").style.display = "flex";
+            } else {
+                alert("Login failed! Use Username: 'TESTUSER', Password: 'Test@123'.");
+            }
+        }
+
+        function showOtherInstructions() {
+            document.getElementById("instructions-page").style.display = "none";
+            document.getElementById("other-instructions-page").style.display = "flex";
+        }
+
+        function backToInstructions() {
+            document.getElementById("other-instructions-page").style.display = "none";
+            document.getElementById("instructions-page").style.display = "flex";
+        }
+
+        function startTest() {
+            document.getElementById("other-instructions-page").style.display = "none";
+            document.getElementById("header").style.display = "flex";
+            document.getElementById("section-selector").style.display = "flex";
+            document.getElementById("main-content").style.display = "flex";
+            document.getElementById("toggle-btn").style.display = "block";
+            currentQuestion = sections[currentSection].start;
+            loadSectionSelector();
+            loadQuestion();
+            startTimer();
+        }
+
+        function loadSectionSelector() {
+            const selector = document.getElementById("section-selector");
+            selector.innerHTML = '<button class="section-btn active">Science</button>';
+        }
+
+        function loadQuestion() {
+            const section = sections[currentSection];
+            const q = section.questions[currentQuestion - section.start];
+            document.getElementById("section-name").innerText = section.name;
+            document.getElementById("palette-section-name").innerText = section.name;
+            document.getElementById("q-number").innerText = currentQuestion + 1;
+            document.getElementById("question-text").innerText = q.q;
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = "";
+            q.options.forEach((opt, i) => {
+                const label = document.createElement("label");
+                label.innerHTML = `<input type="radio" name="q${currentQuestion}" value="${i}" ${answers[currentQuestion] === i ? "checked" : ""}> ${opt}`;
+                optionsDiv.appendChild(label);
+            });
+            visited[currentQuestion] = true;
+            updatePalette();
+            document.getElementById("prev-btn").style.display = currentQuestion === section.start ? "none" : "inline";
+            document.getElementById("next-btn").style.display = currentQuestion === section.end ? "none" : "inline";
+            document.getElementById("submit-btn").style.display = currentQuestion === section.end ? "inline" : "none";
+        }
+
+        function updatePalette() {
+            const section = sections[currentSection];
+            const palette = document.getElementById("palette-buttons");
+            palette.innerHTML = "";
+            let notAnsweredCount = 0, answeredCount = 0, notVisitedCount = 0, markedCount = 0;
+            for (let i = section.start; i <= section.end; i++) {
+                const btn = document.createElement("button");
+                btn.className = "palette-btn";
+                btn.innerText = i + 1;
+                if (i === currentQuestion) {
+                    btn.classList.add("current");
+                }
+                if (answers[i] !== null) {
+                    btn.classList.add("answered");
+                    answeredCount++;
+                    if (markedForReview[i]) {
+                        btn.classList.add("marked");
+                        markedCount++;
+                    }
+                } else if (markedForReview[i]) {
+                    btn.classList.add("marked");
+                    markedCount++;
+                } else if (visited[i]) {
+                    btn.classList.add("visited-not-attempted");
+                    notAnsweredCount++;
+                } else {
+                    notVisitedCount++;
+                }
+                btn.onclick = () => { currentQuestion = i; loadQuestion(); };
+                palette.appendChild(btn);
+            }
+            document.querySelector(".stat.answered").innerText = `${answeredCount} Answered`;
+            document.querySelector(".stat.not-answered").innerText = `${notAnsweredCount} Not Answered`;
+            document.querySelector(".stat.not-visited").innerText = `${notVisitedCount} Not Visited`;
+            document.querySelector(".stat.marked").innerText = `${markedCount} Marked for Review`;
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const toggleBtn = document.getElementById("toggle-btn");
+            const controls = document.getElementById("question-controls");
+            sidebar.classList.toggle("closed");
+            toggleBtn.classList.toggle("closed");
+            toggleBtn.style.right = sidebar.classList.contains("closed") ? "0" : "350px";
+            controls.classList.toggle("closed");
+        }
+
+        function saveAnswer() {
+            const selected = document.querySelector(`input[name="q${currentQuestion}"]:checked`);
+            answers[currentQuestion] = selected ? parseInt(selected.value) : answers[currentQuestion];
+        }
+
+        function nextQuestion() {
+            saveAnswer();
+            const section = sections[currentSection];
+            if (currentQuestion < section.end) {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function prevQuestion() {
+            saveAnswer();
+            const section = sections[currentSection];
+            if (currentQuestion > section.start) {
+                currentQuestion--;
+                loadQuestion();
+            }
+        }
+
+        function markForReview() {
+            saveAnswer();
+            markedForReview[currentQuestion] = !markedForReview[currentQuestion];
+            updatePalette();
+            nextQuestion();
+        }
+
+        function clearResponse() {
+            answers[currentQuestion] = null;
+            const radios = document.querySelectorAll(`input[name="q${currentQuestion}"]`);
+            radios.forEach(radio => radio.checked = false);
+            updatePalette();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById("time").innerText = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+                if (timeLeft <= 0) endTest();
+            }, 1000);
+        }
+
+        function calculateResults() {
+            results = { sections: [], total: { questions: 0, answered: 0, correct: 0, incorrect: 0, marks: 0 } };
+            sections.forEach(section => {
+                let answered = 0, correct = 0, incorrect = 0;
+                for (let i = section.start; i <= section.end; i++) {
+                    if (answers[i] !== null) {
+                        answered++;
+                        if (answers[i] === section.questions[i - section.start].answer) correct++;
+                        else incorrect++;
+                    }
+                }
+                const totalQuestions = section.end - section.start + 1;
+                const marks = correct;
+                results.sections.push({ name: section.name, totalQuestions, answered, correct, incorrect, marks });
+                results.total.questions += totalQuestions;
+                results.total.answered += answered;
+                results.total.correct += correct;
+                results.total.incorrect += incorrect;
+                results.total.marks += marks;
+            });
+        }
+
+        function showResults() {
+            document.getElementById("main-content").style.display = "none";
+            document.getElementById("header").style.display = "none";
+            document.getElementById("section-selector").style.display = "none";
+            document.getElementById("toggle-btn").style.display = "none";
+            document.getElementById("result-page").style.display = "flex";
+
+            const tableBody = document.getElementById("result-table-body");
+            tableBody.innerHTML = "";
+            results.sections.forEach(section => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${section.name}</td>
+                    <td>${section.totalQuestions}</td>
+                    <td>${section.answered}</td>
+                    <td>${section.correct}</td>
+                    <td>${section.incorrect}</td>
+                    <td>${section.marks}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+            document.getElementById("total-questions").innerText = results.total.questions;
+            document.getElementById("total-answered").innerText = results.total.answered;
+            document.getElementById("total-correct").innerText = results.total.correct;
+            document.getElementById("total-incorrect").innerText = results.total.incorrect;
+            document.getElementById("total-marks").innerText = results.total.marks;
+            document.getElementById("overall-score").innerText = results.total.marks;
+        }
+
+        function showAnalysis() {
+            document.getElementById("result-page").style.display = "none";
+            document.getElementById("analysis-page").style.display = "flex";
+            analysisSection = 0;
+            analysisQuestion = sections[analysisSection].start;
+            loadAnalysisSectionSelector();
+            loadAnalysisQuestion();
+        }
+
+        function loadAnalysisSectionSelector() {
+            const selector = document.getElementById("analysis-section-selector");
+            selector.innerHTML = '<button class="section-btn active">Science</button>';
+        }
+
+        function loadAnalysisQuestion() {
+            const section = sections[analysisSection];
+            const q = section.questions[analysisQuestion - section.start];
+            document.getElementById("analysis-q-number").innerText = analysisQuestion + 1;
+            document.getElementById("analysis-question-text").innerText = q.q;
+            const optionsDiv = document.getElementById("analysis-options");
+            optionsDiv.innerHTML = "";
+            q.options.forEach((opt, i) => {
+                const label = document.createElement("label");
+                label.innerHTML = `${opt}`;
+                if (i === q.answer) label.classList.add("correct");
+                if (answers[analysisQuestion] === i && i !== q.answer) label.classList.add("incorrect");
+                optionsDiv.appendChild(label);
+            });
+            document.getElementById("correct-answer").innerText = q.options[q.answer];
+            document.getElementById("explanation").innerText = q.explanation;
+            updateAnalysisPalette();
+        }
+
+        function updateAnalysisPalette() {
+            const section = sections[analysisSection];
+            const palette = document.getElementById("analysis-palette-buttons");
+            palette.innerHTML = "";
+            for (let i = section.start; i <= section.end; i++) {
+                const btn = document.createElement("button");
+                btn.className = "palette-btn";
+                btn.innerText = i + 1;
+                if (i === analysisQuestion) {
+                    btn.classList.add("current");
+                }
+                if (answers[i] !== null) {
+                    if (answers[i] === section.questions[i - section.start].answer) {
+                        btn.classList.add("correct");
+                    } else {
+                        btn.classList.add("incorrect");
+                    }
+                    if (markedForReview[i]) {
+                        btn.classList.add("marked");
+                    }
+                } else if (markedForReview[i]) {
+                    btn.classList.add("marked");
+                }
+                btn.onclick = () => { analysisQuestion = i; loadAnalysisQuestion(); };
+                palette.appendChild(btn);
+            }
+        }
+
+        function prevAnalysisQuestion() {
+            const section = sections[analysisSection];
+            if (analysisQuestion > section.start) {
+                analysisQuestion--;
+                loadAnalysisQuestion();
+            }
+        }
+
+        function nextAnalysisQuestion() {
+            const section = sections[analysisSection];
+            if (analysisQuestion < section.end) {
+                analysisQuestion++;
+                loadAnalysisQuestion();
+            }
+        }
+
+        function backToResults() {
+            document.getElementById("analysis-page").style.display = "none";
+            document.getElementById("result-page").style.display = "flex";
+        }
+
+        function endTest() {
+            saveAnswer();
+            clearInterval(timerInterval);
+            calculateResults();
+            showResults();
+        }
+
+        function restartTest() {
+            location.reload();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkbox = document.getElementById("declaration-checkbox");
+            const startBtn = document.getElementById("start-test-btn");
+            if (checkbox && startBtn) {
+                checkbox.addEventListener("change", function() {
+                    startBtn.disabled = !this.checked;
+                });
+            }
+
+            document.getElementById("prev-btn").onclick = prevQuestion;
+            document.getElementById("next-btn").onclick = nextQuestion;
+            document.getElementById("mark-review-btn").onclick = markForReview;
+            document.getElementById("clear-btn").onclick = clearResponse;
+            document.getElementById("submit-btn").onclick = endTest;
+        });
+    </script>
+</body>
+</html>
